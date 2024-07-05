@@ -25,7 +25,7 @@ init_lapipi:
 	;sub eax, ecx ; get final jmp target addr
 
 ; Rewrite lua_pushnumber
-; esi - lua_State pointer, double - stack top (esp)
+; ecx - lua_State pointer, double - stack top (esp)
 lpi_pushnumber:
 	mov eax, [ecx+20] ; eax = L->top (TValue*)
 	; C: L->top->n = n
@@ -51,6 +51,15 @@ lpi_pushnumber:
 	mov dword [eax], 0
 	mov dword [eax+4], 0xfff80000 
 	jmp .stack_check
+
+; Rewrite lua_gettop
+; ecx - lua_State pointer
+; eax - result 
+lpi_gettop:
+	mov eax, [ecx+20]
+	sub eax, [ecx+16]
+	sar eax, 3
+	retn
 
 ; use lpi_* with "call [lpi_blah]" or "jmp [lpi_blah]"
 section .data
