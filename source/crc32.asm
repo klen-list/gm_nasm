@@ -1,7 +1,6 @@
 default rel
 section .text
 
-extern lua_pushnumber
 extern lua_setfield
 extern lua_pushcclosure
 extern lua_tolstring 
