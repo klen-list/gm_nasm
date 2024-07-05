@@ -6,12 +6,16 @@ extern lua_setfield
 extern lua_pushcclosure
 extern lua_tolstring 
 
+extern init_lapipi
+extern lpi_pushnumber
+
 global gmod13_open
 global gmod13_close
 
 gmod13_open: ; Todo: optimize stack use like lua_function
 	push ebx
 	call gen_crc_table
+	call init_lapipi 
 	pop ebx
 
 	push 0 ; arg3 - 0 ; always zero in lua_pushcfunction
@@ -33,8 +37,9 @@ gmod13_close:
 	ret
 lua_function:
 	push ebx
+	push esi
+	mov esi, [esp+12] ; lua_State
 	sub esp, 16
-	mov esi, [esp+24] ; lua_State
 
 	mov [esp], esi ; arg1 - lua_State
 	mov dword [esp+4], 1 ; arg2 - Index in lua stack (1)
@@ -48,11 +53,12 @@ lua_function:
 	movd xmm0, ebx ; Copy 32-bit result to 64-bit SIMD register
 	movq [esp], xmm0 ; After this - copy to stack (8 bytes)
 	fild qword [esp] ; Load 8 bytes from stack to FPU, for double convertion
-	fstp qword [esp+4] ; Extract 8 bytes from FPU to stack
-	mov [esp], esi ; Copy lua_State to stack top
-	call lua_pushnumber ; int __cdecl lua_pushnumber(int*, double)
+	fstp qword [esp] ; Extract 8 bytes from FPU to stack
+	mov ecx, esi
+	call lpi_pushnumber
 
 	add esp, 16
+	pop esi
 	pop ebx
 	mov eax, 1 ; return 1
 	ret

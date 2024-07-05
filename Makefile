@@ -9,12 +9,15 @@ endif
 
 all: crc32 hello
 
-crc32: crc32.o
-	ld $(LDFLAGS) $(SOURCE)crc32.o $(LUA_SHARED) -o gmsv_crc32_linux.dll
+crc32: crc32.o lapipi.o
+	ld $(LDFLAGS) $(SOURCE)crc32.o $(SOURCE)lapipi.o $(LUA_SHARED) -o gmsv_crc32_linux.dll
 	#cp gmsv_crc32_linux.dll ~/Steam/steamapps/common/GarrysModDS/garrysmod/lua/bin/gmsv_crc32_linux.dll
 
 crc32.o:
-	nasm $(CFLAGS) $(SOURCE)crc32.asm	
+	nasm $(CFLAGS) $(SOURCE)crc32.asm
+
+lapipi.o:
+	nasm $(CFLAGS) $(SOURCE)lapipi.asm
 
 hello: hello.o
 	ld $(LDFLAGS) $(SOURCE)hello.o $(LUA_SHARED) -o gmsv_hello_linux.dll
